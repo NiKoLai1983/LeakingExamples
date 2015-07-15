@@ -31,10 +31,23 @@ public class SingletonLeakingActivity extends ActionBarActivity {
             public void onEvent(boolean response) {
                 Log.d("Leaking Activity", "Value? " + response);
             }
+            @Override
+            public SingletonLeakingActivity getActivity() {
+                return SingletonLeakingActivity.this;
+            }
         });
         // Insert the object inside the singleton. The activity is leaked in there
         MySingleton.getInstance().add(leakingObject);
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //When the activity is destroyed, we remove the instance of SingletonLeakingObject
+        //which has this activity attached to avoid it to be leaked.
+        //Another approach would be setting the listener of the SingletonLeakingObject to null
+        MySingleton.getInstance().delete(this);
     }
 
     @Override
